@@ -54,10 +54,6 @@ function StartCreationSession()
 			{
 				strError = 'Please enter an account name that is at least 3 characters long and uses only a-z, A-Z, 0-9 or _ characters.';
 			}
-			else if ( data.success == 13 )
-			{
-				strError = 'Please enter a valid email address.';
-			}
 			else if ( data.success == 17 )
 			{
 				strError = 'It appears you\'ve entered a disposable email address, or are using an email provider that cannot be used on Steam. Please provide a different email address.';
