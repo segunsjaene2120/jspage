@@ -44,27 +44,8 @@ function StartCreationSession()
 
 		if ( data.success != 1 )
 		{
-			var strError = data.details;
-
-			if ( data.success == 14 )
-			{
-				strError = 'The account name you have chosen is not available. Please choose another name.';
-			}
-			else if ( data.success == 8 )
-			{
-				strError = 'Please enter an account name that is at least 3 characters long and uses only a-z, A-Z, 0-9 or _ characters.';
-			}
-			else if ( data.success == 17 )
-			{
-				strError = 'It appears you\'ve entered a disposable email address, or are using an email provider that cannot be used on Steam. Please provide a different email address.';
-			}
-			else if ( data.success == 101 )
-			{
-				new Effect.Morph( 'captcha_text', {style: 'border: 1px solid #b44040', duration: 0.5 } );
-			}
-
-			RefreshCaptcha();
-			ShowError( strError );
+			g_creationSessionID = data.sessionid;
+			WaitForEmailVerification();
 		}
 		else
 		{
@@ -77,7 +58,6 @@ function StartCreationSession()
 function StartCreationSessionParentalConsent()
 {
 	var email = $('parental_email').value;
-	var email_regex = /^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,24}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i
 
 	$J.ajax( {
 		type: 'POST',
@@ -99,25 +79,9 @@ function StartCreationSessionParentalConsent()
 
 		if ( data.success != 1 )
 		{
-			var strError = data.details;
+			g_creationSessionID = data.sessionid;
 
-			if ( data.success == 62 )
-			{
-				strError = 'This e-mail address must be different from your own.';
-				$J( '#parental_email' ).css( "border", "1px solid #b44040" );
-			}
-			else if ( data.success == 17 )
-			{
-				strError = 'It appears you\'ve entered a disposable email address, or are using an email provider that cannot be used on Steam. Please provide a different email address.';
-			}
-			else if ( data.success == 101 )
-			{
-								g_parentalConsentDialog.Dismiss();
-				g_parentalConsentDialog = null;
-			}
-
-			RefreshCaptcha();
-			ShowError( strError );
+			ParentalConsentRequested();
 		}
 		else
 		{
@@ -302,24 +266,6 @@ function FinishFormVerification()
 	}
 
 	var email = $('email').value;
-	var email_regex = /^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,24}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i
-
-
-	if ( !g_bGuest )
-    {
-        var reenter_email = $('reenter_email').value;
-        if ( reenter_email == '' )
-        {
-            errorString += 'Please fill in the Confirm email address field.<br/>';
-            rgBadFields.reenter_email = true;
-        }
-        else if ( email.toLowerCase() != reenter_email.toLowerCase() )
-        {
-            errorString += 'Please enter the same address in both email address fields.<br/>';
-            rgBadFields.email = true;
-            rgBadFields.reenter_email = true;
-        }
-    }
 
 		if ( !( $('lt').value == 1 || $('lt').value == 4 ) )
 	{
@@ -1048,3 +994,7 @@ function OnCountryChange( elCountry )
 		$J( '#eu_ssa_box' ).slideDown();
 	}
 }
+
+
+
+
